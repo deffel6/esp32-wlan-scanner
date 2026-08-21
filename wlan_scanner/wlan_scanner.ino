@@ -296,20 +296,32 @@ static void handleNotFound(){
 // Der Grund der Ablehnung steht nur im Ereignis, nicht in WiFi.status().
 // Ohne ihn liesse sich "Passwort falsch" nicht von "Netz weg" unterscheiden.
 static void onWiFiEvent(WiFiEvent_t ev, WiFiEventInfo_t info){
-  if(ev==ARDUINO_EVENT_WIFI_STA_DISCONNECTED){
-    gLastReason=info.wifi_sta_disconnected.reason;
-    Serial.printf("[WIFI] getrennt, Grund %u\n",(unsigned)gLastReason);
-  }
+  if(ev!=ARDUINO_EVENT_WIFI_STA_DISCONNECTED) return;
+  uint8_t r=info.wifi_sta_disconnected.reason;
+  Serial.printf("[WIFI] getrennt, Grund %u\n",(unsigned)r);
+  // 8 und 36 meldet das Board, wenn es sich SELBST abmeldet - also genau
+  // das, was disconnect() vor jedem Versuch tut. Als Fehlergrund gemerkt,
+  // wuerden sie den echten Grund ueberdecken.
+  if(r==WIFI_REASON_ASSOC_LEAVE || r==WIFI_REASON_STA_LEAVING) return;
+  gLastReason=r;
 }
 static String reasonText(uint8_t r){
   switch(r){
-    case WIFI_REASON_NO_AP_FOUND:            return "Netz nicht gefunden";
+    case WIFI_REASON_NO_AP_FOUND:
+    case WIFI_REASON_NO_AP_FOUND_W_COMPATIBLE_SECURITY:
+    case WIFI_REASON_NO_AP_FOUND_IN_AUTHMODE_THRESHOLD:
+    case WIFI_REASON_NO_AP_FOUND_IN_RSSI_THRESHOLD:
+                                             return "Netz nicht gefunden";
     case WIFI_REASON_AUTH_FAIL:
     case WIFI_REASON_AUTH_EXPIRE:
     case WIFI_REASON_HANDSHAKE_TIMEOUT:
     case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT: return "Passwort falsch";
     case WIFI_REASON_ASSOC_FAIL:             return "Netz hat abgelehnt";
-    case 0:                                  return "Zeit abgelaufen";
+    case WIFI_REASON_CONNECTION_FAIL:        return "Verbindung kam nicht zustande";
+    case WIFI_REASON_BEACON_TIMEOUT:         return "Netz nicht mehr zu hoeren";
+    case WIFI_REASON_STA_LEAVING:
+    case WIFI_REASON_ASSOC_LEAVE:            return "vom Board selbst getrennt";
+    case 0:                                  return "Zeit abgelaufen, kein Grund gemeldet";
     default: return String("abgelehnt, Grund ")+String((int)r);
   }
 }
@@ -354,10 +366,19 @@ void loop(){
 
   // Anmeldeversuch starten
   if(gTry==T_WANTED){
+    // Ein noch laufender Suchlauf muss zuerst weg: er springt im
+    // Hundertstelsekundentakt zwischen den Kanaelen, und die Anmeldung
+    // scheitert daran zuverlaessig.
+    if(gScanning){
+      WiFi.scanDelete();
+      gScanning=false;
+      Serial.println("[TRY] laufenden Suchlauf abgebrochen");
+    }
     gTry=T_RUNNING;
     gTryStart=now;
-    gLastReason=0;
     WiFi.disconnect();
+    delay(120);          // das eigene Abmelde-Ereignis noch abwarten
+    gLastReason=0;       // ... und erst danach den Grund scharf stellen
     // Passwort leer lassen, wenn das Netz offen ist - begin() mit leerem
     // Passwort ist genau dafuer vorgesehen.
     WiFi.begin(gTrySsid.c_str(), gTryPass.length()?gTryPass.c_str():nullptr);

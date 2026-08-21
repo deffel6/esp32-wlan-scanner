@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ESP32 WLAN-Scanner – Installation</title>
+<script type="module"
+        src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js"></script>
+<style>
+  :root{
+    --bg:#0a0a0a; --card:#161616; --line:#2a2a2a;
+    --fg:#eee; --dim:#999; --accent:#f0a500;
+  }
+  @media (prefers-color-scheme:light){
+    :root{ --bg:#f6f6f6; --card:#fff; --line:#e2e2e2; --fg:#1a1a1a; --dim:#666; }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--fg);
+    line-height:1.6; padding:24px; display:flex; justify-content:center;
+  }
+  .wrap{width:100%;max-width:640px}
+  h1{font-size:1.6rem;margin-bottom:4px}
+  .sub{color:var(--dim);margin-bottom:28px}
+  .card{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:22px; margin-bottom:18px;
+  }
+  h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;
+     color:var(--accent);margin-bottom:12px}
+  ol{padding-left:20px;color:var(--dim)} li{margin-bottom:7px}
+  p{color:var(--dim)}
+  .cta{text-align:center;padding:28px 22px}
+  .warn{
+    border-left:3px solid #f0a500;
+    padding:12px 16px;background:var(--card);
+    border-radius:0 8px 8px 0;color:var(--dim);font-size:.9rem;
+    margin-bottom:18px;
+  }
+  code{
+    font-family:ui-monospace,Menlo,monospace;font-size:.85em;
+    background:#8881;border:1px solid var(--line);border-radius:5px;padding:1px 5px;
+  }
+  strong{color:var(--fg)}
+  a{color:var(--accent)}
+  footer{text-align:center;color:var(--dim);font-size:.85rem;margin-top:24px}
+  esp-web-install-button{--esp-tools-button-color:#000;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>&#128246; ESP32 WLAN-Scanner</h1>
+  <p class="sub">Version 1.0.0 &ndash; zeigt alle gehörten WLANs auf einem runden
+  Display und meldet sich auf Wunsch bei einem davon an.</p>
+
+  <div class="card">
+    <h2>Was das Gerät macht</h2>
+    <ol>
+      <li>Sucht laufend nach WLANs, auch nach solchen mit verstecktem Namen.</li>
+      <li>Zeigt sie auf dem Display: Name und Signalstärke, nach Stärke sortiert,
+      seitenweise weitergeblättert.</li>
+      <li>Öffnet einen eigenen Zugangspunkt <strong>WLAN-Scanner</strong>, über den
+      sich im Browser ein Netz auswählen und das Passwort prüfen lässt.</li>
+      <li>Meldet zurück, ob die Anmeldung geklappt hat &ndash; mit IP-Adresse,
+      oder mit dem Grund der Ablehnung.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Hardware</h2>
+    <p><strong>ESP32-C3</strong> mit rundem <strong>GC9A01A</strong>-Display
+    (240&times;240). Pinbelegung: SCLK 6, MOSI 7, DC 2, CS 10, RST 1,
+    Beleuchtung 3 &ndash; dieselbe wie beim
+    <a href="https://deffel6.github.io/anker-solix-display/">Anker Solix Display</a>,
+    beide Sketche laufen also auf demselben Board.</p>
+  </div>
+
+  <div class="warn">
+    Zum Aufspielen braucht es <strong>Chrome oder Edge</strong> auf einem Rechner
+    und ein USB-Datenkabel. Firefox und Safari können nicht auf die serielle
+    Schnittstelle zugreifen, auf Mobilgeräten geht es ebenfalls nicht.
+  </div>
+
+  <div class="card cta">
+    <esp-web-install-button manifest="manifest.json">
+      <button slot="activate" style="
+        font:600 1rem/1 inherit; padding:15px 32px; cursor:pointer;
+        background:var(--accent); color:#000; border:none; border-radius:10px;">
+        Firmware installieren
+      </button>
+      <span slot="unsupported">
+        Dieser Browser kann das nicht &mdash; bitte Chrome oder Edge verwenden.
+      </span>
+      <span slot="not-allowed">
+        Nur über HTTPS oder localhost möglich.
+      </span>
+    </esp-web-install-button>
+  </div>
+
+  <div class="card">
+    <h2>Danach</h2>
+    <ol>
+      <li>Das Board spannt das offene WLAN <strong>WLAN-Scanner</strong> auf.</li>
+      <li>Damit verbinden &ndash; das Anmeldefenster öffnet sich meist von selbst,
+      sonst <code>192.168.4.1</code> im Browser aufrufen.</li>
+      <li>Ein Netz aus der Liste antippen, Passwort eingeben, anmelden.</li>
+      <li>Die Seite meldet <strong>Verbunden</strong> samt IP-Adresse und Signal,
+      oder den Grund der Ablehnung.</li>
+    </ol>
+    <p style="margin-top:10px;font-size:.9rem">Beim Verbinden wechselt das Board
+    auf den Kanal des Zielnetzes. Die Verbindung zum Portal bricht dabei kurz ab
+    und kommt von selbst zurück &ndash; das ist normal.</p>
+  </div>
+
+  <div class="card">
+    <h2>Im seriellen Monitor</h2>
+    <p>Bei 115200 Baud erscheint nach jedem Suchlauf die vollständige Liste mit
+    Name, Signalstärke, Kanal, Verschlüsselung und BSSID. Das eingegebene
+    Passwort wird bewusst nicht protokolliert.</p>
+  </div>
+
+  <footer>
+    <a href="https://github.com/deffel6/esp32-wlan-scanner">Quelltext auf GitHub</a>
+    &middot; Lizenz: PolyForm Noncommercial 1.0.0
+  </footer>
+</div>
+</body>
+</html>

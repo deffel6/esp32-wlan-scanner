@@ -6,10 +6,22 @@
     {
       "chipFamily": "ESP32-C3",
       "parts": [
-        { "path": "firmware/wlan_scanner.ino.bootloader.bin", "offset": 0 },
-        { "path": "firmware/wlan_scanner.ino.partitions.bin", "offset": 32768 },
-        { "path": "firmware/boot_app0.bin", "offset": 57344 },
-        { "path": "firmware/wlan_scanner.ino.bin", "offset": 65536 }
+        {
+          "path": "https://deffel6.github.io/esp32-wlan-scanner/firmware/wlan_scanner.ino.bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "https://deffel6.github.io/esp32-wlan-scanner/firmware/wlan_scanner.ino.partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "https://deffel6.github.io/esp32-wlan-scanner/firmware/boot_app0.bin",
+          "offset": 57344
+        },
+        {
+          "path": "https://deffel6.github.io/esp32-wlan-scanner/firmware/wlan_scanner.ino.bin",
+          "offset": 65536
+        }
       ]
     }
   ]
